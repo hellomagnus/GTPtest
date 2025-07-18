@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin - Lego Reviews Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --lego-red: #DA291C;
+            --lego-yellow: #FFCD00;
+            --lego-blue: #0055BF;
+        }
+        .lego-blue {
+            background-color: var(--lego-blue) !important;
+        }
+        .btn-lego-yellow {
+            background-color: var(--lego-yellow);
+            border-color: var(--lego-yellow);
+            color: #000;
+        }
+        .btn-lego-yellow:hover {
+            background-color: #ffe45e;
+            border-color: #ffe45e;
+            color: #000;
+        }
+        .btn-outline-lego-red {
+            color: var(--lego-red);
+            border-color: var(--lego-red);
+        }
+        .btn-outline-lego-red:hover {
+            background-color: var(--lego-red);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark lego-blue">
+        <div class="container">
+            <span class="navbar-brand">Admin Panel</span>
+            <button id="logout" class="btn btn-outline-light btn-sm">Logout</button>
+        </div>
+    </nav>
+    <div class="container py-4">
+        <h1 class="mb-4">Edit Content</h1>
+        <div class="mb-3">
+            <label class="form-label">Hero Title</label>
+            <input type="text" class="form-control" id="heroTitleInput">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Hero Subtitle</label>
+            <input type="text" class="form-control" id="heroSubtitleInput">
+        </div>
+        <h2 class="mt-4">Reviews</h2>
+        <div id="reviewsEditor"></div>
+        <button class="btn btn-outline-lego-red mt-2" id="addReview">Add Review</button>
+        <button class="btn btn-lego-yellow mt-2" id="save">Save Changes</button>
+    </div>
+    <script>
+        if (localStorage.getItem('loggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        const defaultReviews = [
+            {
+                img: 'https://www.lego.com/cdn/cs/set/assets/bltf25b86a7ad8b93c6/PAB_Mobile_750x750_3.jpg?format=webply&fit=crop&quality=75&width=600&height=600&dpr=1?auto=format&fit=crop&w=600&q=80',
+                title: 'Lego Star Wars X-Wing',
+                text: "A detailed review of the iconic X-Wing set. Find out why it's a must-have for Star Wars fans!"
+            },
+            {
+                img: 'https://www.lego.com/cdn/cs/set/assets/bltf513a3746b8267e9/10358_Prod_en-gb.png?format=webply&fit=bounds&quality=75&width=528&height=528&dpr=1?auto=format&fit=crop&w=600&q=80',
+                title: 'Lego Technic Bugatti',
+                text: 'Explore the engineering marvel of the Technic Bugatti. Perfect for advanced builders!'
+            },
+            {
+                img: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80',
+                title: 'Lego Friends Heartlake City',
+                text: 'A fun and colorful set for creative minds. See what makes Heartlake City so special!'
+            }
+        ];
+
+        const heroTitleInput = document.getElementById('heroTitleInput');
+        const heroSubtitleInput = document.getElementById('heroSubtitleInput');
+        const reviewsEditor = document.getElementById('reviewsEditor');
+
+        heroTitleInput.value = localStorage.getItem('heroTitle') || 'Discover the Best Lego Sets';
+        heroSubtitleInput.value = localStorage.getItem('heroSubtitle') || 'In-depth reviews, build tips, and the latest Lego news. Join our community and connect on social media!';
+
+        let reviews = JSON.parse(localStorage.getItem('reviews')) || defaultReviews.slice();
+
+        function renderReviews() {
+            reviewsEditor.innerHTML = '';
+            reviews.forEach((rev, idx) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'border p-3 mb-3';
+                wrapper.innerHTML = `
+                    <div class="mb-2">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control review-title" data-idx="${idx}" value="${rev.title}">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control review-text" data-idx="${idx}">${rev.text}</textarea>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Image URL</label>
+                        <input type="text" class="form-control review-img" data-idx="${idx}" value="${rev.img}">
+                    </div>
+                    <button class="btn btn-sm btn-danger delete-review" data-idx="${idx}">Delete</button>
+                `;
+                reviewsEditor.appendChild(wrapper);
+            });
+        }
+
+        renderReviews();
+
+        document.getElementById('addReview').addEventListener('click', () => {
+            reviews.push({title: '', text: '', img: ''});
+            renderReviews();
+        });
+
+        reviewsEditor.addEventListener('click', e => {
+            if (e.target.classList.contains('delete-review')) {
+                const idx = parseInt(e.target.getAttribute('data-idx'));
+                reviews.splice(idx, 1);
+                renderReviews();
+            }
+        });
+
+        function collectData() {
+            reviews.forEach((rev, idx) => {
+                rev.title = document.querySelector(`.review-title[data-idx="${idx}"]`).value;
+                rev.text = document.querySelector(`.review-text[data-idx="${idx}"]`).value;
+                rev.img = document.querySelector(`.review-img[data-idx="${idx}"]`).value;
+            });
+        }
+
+        document.getElementById('save').addEventListener('click', () => {
+            collectData();
+            localStorage.setItem('heroTitle', heroTitleInput.value);
+            localStorage.setItem('heroSubtitle', heroSubtitleInput.value);
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+            alert('Content saved!');
+        });
+
+        document.getElementById('logout').addEventListener('click', () => {
+            localStorage.removeItem('loggedIn');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
