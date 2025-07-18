@@ -155,35 +155,40 @@
 
         const defaultReviews = [
             {
-                img: 'https://www.lego.com/cdn/cs/set/assets/bltf25b86a7ad8b93c6/PAB_Mobile_750x750_3.jpg?format=webply&fit=crop&quality=75&width=600&height=600&dpr=1?auto=format&amp;fit=crop&amp;w=600&amp;q=80',
+                img: 'https://www.lego.com/cdn/cs/set/assets/bltf25b86a7ad8b93c6/PAB_Mobile_750x750_3.jpg?format=webply&fit=crop&quality=75&width=600&height=600&dpr=1',
                 title: 'Lego Star Wars X-Wing',
                 text: "A detailed review of the iconic X-Wing set. Find out why it's a must-have for Star Wars fans!"
             },
             {
-                img: 'https://www.lego.com/cdn/cs/set/assets/bltf513a3746b8267e9/10358_Prod_en-gb.png?format=webply&fit=bounds&quality=75&width=528&height=528&dpr=1?auto=format&amp;fit=crop&amp;w=600&amp;q=80',
+                img: 'https://www.lego.com/cdn/cs/set/assets/bltf513a3746b8267e9/10358_Prod_en-gb.png?format=webply&fit=bounds&quality=75&width=528&height=528&dpr=1',
                 title: 'Lego Technic Bugatti',
                 text: 'Explore the engineering marvel of the Technic Bugatti. Perfect for advanced builders!'
             },
             {
-                img: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&amp;fit=crop&amp;w=600&amp;q=80',
+                img: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80',
                 title: 'Lego Friends Heartlake City',
                 text: 'A fun and colorful set for creative minds. See what makes Heartlake City so special!'
             }
         ];
 
-        const reviews = JSON.parse(localStorage.getItem('reviews')) || defaultReviews;
-        displayReviews(reviews);
+        document.addEventListener('DOMContentLoaded', function() {
+            const reviews = JSON.parse(localStorage.getItem('reviews')) || defaultReviews;
+            displayReviews(reviews);
 
-        const heroTitleEl = document.getElementById('heroTitle');
-        const heroSubtitleEl = document.getElementById('heroSubtitle');
-        heroTitleEl.textContent = localStorage.getItem('heroTitle') || heroTitleEl.textContent;
-        heroSubtitleEl.textContent = localStorage.getItem('heroSubtitle') || heroSubtitleEl.textContent;
+            const heroTitleEl = document.getElementById('heroTitle');
+            const heroSubtitleEl = document.getElementById('heroSubtitle');
+            heroTitleEl.textContent = localStorage.getItem('heroTitle') || heroTitleEl.textContent;
+            heroSubtitleEl.textContent = localStorage.getItem('heroSubtitle') || heroSubtitleEl.textContent;
 
-        const adminLink = document.getElementById('adminLink');
-        if (localStorage.getItem('loggedIn') === 'true') {
-            adminLink.textContent = 'Admin';
-            adminLink.href = 'admin.html';
-        }
+            const adminLink = document.getElementById('adminLink');
+            if (localStorage.getItem('loggedIn') === 'true') {
+                adminLink.textContent = 'Admin';
+                adminLink.href = 'admin.html';
+            }
+
+            // Observe initial fade-in elements
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        });
     </script>
 </body>
 </html>
