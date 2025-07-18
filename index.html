@@ -83,6 +83,7 @@
                     <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
                     <li class="nav-item"><a class="nav-link" href="#social">Social</a></li>
+                    <li class="nav-item"><a class="nav-link" id="adminLink" href="login.html">Login</a></li>
                 </ul>
             </div>
         </div>
@@ -90,8 +91,8 @@
 
     <section class="hero text-center fade-in">
         <div class="container">
-            <h1 class="display-4 fw-bold">Discover the Best Lego Sets</h1>
-            <p class="lead">In-depth reviews, build tips, and the latest Lego news. Join our community and connect on social media!</p>
+            <h1 class="display-4 fw-bold" id="heroTitle">Discover the Best Lego Sets</h1>
+            <p class="lead" id="heroSubtitle">In-depth reviews, build tips, and the latest Lego news. Join our community and connect on social media!</p>
             <a href="#reviews" class="btn btn-lego-yellow btn-lg mt-3">See Reviews</a>
         </div>
     </section>
@@ -99,38 +100,7 @@
     <section id="reviews" class="py-5 bg-light fade-in">
         <div class="container">
             <h2 class="mb-4 text-center">Latest Lego Reviews</h2>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card h-100 fade-in">
-                        <img src="https://www.lego.com/cdn/cs/set/assets/bltf25b86a7ad8b93c6/PAB_Mobile_750x750_3.jpg?format=webply&fit=crop&quality=75&width=600&height=600&dpr=1?auto=format&amp;fit=crop&amp;w=600&amp;q=80" class="card-img-top" alt="Lego Set 1">
-                        <div class="card-body">
-                            <h5 class="card-title">Lego Star Wars X-Wing</h5>
-                            <p class="card-text">A detailed review of the iconic X-Wing set. Find out why it's a must-have for Star Wars fans!</p>
-                            <a href="#" class="btn btn-outline-lego-red btn-sm">Read Review</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 fade-in">
-                        <img src="https://www.lego.com/cdn/cs/set/assets/bltf513a3746b8267e9/10358_Prod_en-gb.png?format=webply&fit=bounds&quality=75&width=528&height=528&dpr=1?auto=format&amp;fit=crop&amp;w=600&amp;q=80" class="card-img-top" alt="Lego Set 2">
-                        <div class="card-body">
-                            <h5 class="card-title">Lego Technic Bugatti</h5>
-                            <p class="card-text">Explore the engineering marvel of the Technic Bugatti. Perfect for advanced builders!</p>
-                            <a href="#" class="btn btn-outline-lego-red btn-sm">Read Review</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 fade-in">
-                        <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&amp;fit=crop&amp;w=600&amp;q=80" class="card-img-top" alt="Lego Set 3">
-                        <div class="card-body">
-                            <h5 class="card-title">Lego Friends Heartlake City</h5>
-                            <p class="card-text">A fun and colorful set for creative minds. See what makes Heartlake City so special!</p>
-                            <a href="#" class="btn btn-outline-lego-red btn-sm">Read Review</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="row g-4" id="reviewsContainer"></div>
         </div>
     </section>
 
@@ -163,7 +133,57 @@
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        function displayReviews(reviews) {
+            const container = document.getElementById('reviewsContainer');
+            container.innerHTML = '';
+            reviews.forEach(review => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4';
+                col.innerHTML = `
+                    <div class="card h-100 fade-in">
+                        <img src="${review.img}" class="card-img-top" alt="${review.title}">
+                        <div class="card-body">
+                            <h5 class="card-title">${review.title}</h5>
+                            <p class="card-text">${review.text}</p>
+                            <a href="#" class="btn btn-outline-lego-red btn-sm">Read Review</a>
+                        </div>
+                    </div>`;
+                container.appendChild(col);
+            });
+            container.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        }
+
+        const defaultReviews = [
+            {
+                img: 'https://www.lego.com/cdn/cs/set/assets/bltf25b86a7ad8b93c6/PAB_Mobile_750x750_3.jpg?format=webply&fit=crop&quality=75&width=600&height=600&dpr=1?auto=format&amp;fit=crop&amp;w=600&amp;q=80',
+                title: 'Lego Star Wars X-Wing',
+                text: "A detailed review of the iconic X-Wing set. Find out why it's a must-have for Star Wars fans!"
+            },
+            {
+                img: 'https://www.lego.com/cdn/cs/set/assets/bltf513a3746b8267e9/10358_Prod_en-gb.png?format=webply&fit=bounds&quality=75&width=528&height=528&dpr=1?auto=format&amp;fit=crop&amp;w=600&amp;q=80',
+                title: 'Lego Technic Bugatti',
+                text: 'Explore the engineering marvel of the Technic Bugatti. Perfect for advanced builders!'
+            },
+            {
+                img: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&amp;fit=crop&amp;w=600&amp;q=80',
+                title: 'Lego Friends Heartlake City',
+                text: 'A fun and colorful set for creative minds. See what makes Heartlake City so special!'
+            }
+        ];
+
+        const reviews = JSON.parse(localStorage.getItem('reviews')) || defaultReviews;
+        displayReviews(reviews);
+
+        const heroTitleEl = document.getElementById('heroTitle');
+        const heroSubtitleEl = document.getElementById('heroSubtitle');
+        heroTitleEl.textContent = localStorage.getItem('heroTitle') || heroTitleEl.textContent;
+        heroSubtitleEl.textContent = localStorage.getItem('heroSubtitle') || heroSubtitleEl.textContent;
+
+        const adminLink = document.getElementById('adminLink');
+        if (localStorage.getItem('loggedIn') === 'true') {
+            adminLink.textContent = 'Admin';
+            adminLink.href = 'admin.html';
+        }
     </script>
 </body>
 </html>
