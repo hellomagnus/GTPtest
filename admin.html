@@ -83,10 +83,23 @@
         const heroSubtitleInput = document.getElementById('heroSubtitleInput');
         const reviewsEditor = document.getElementById('reviewsEditor');
 
-        heroTitleInput.value = localStorage.getItem('heroTitle') || 'Discover the Best Lego Sets';
-        heroSubtitleInput.value = localStorage.getItem('heroSubtitle') || 'In-depth reviews, build tips, and the latest Lego news. Join our community and connect on social media!';
+        let reviews = defaultReviews.slice();
 
-        let reviews = JSON.parse(localStorage.getItem('reviews')) || defaultReviews.slice();
+        async function loadContent() {
+            try {
+                const res = await fetch('/content');
+                const data = await res.json();
+                heroTitleInput.value = data.hero_title;
+                heroSubtitleInput.value = data.hero_subtitle;
+                reviews = data.reviews;
+            } catch (err) {
+                // fallback to any local data
+                heroTitleInput.value = localStorage.getItem('heroTitle') || 'Discover the Best Lego Sets';
+                heroSubtitleInput.value = localStorage.getItem('heroSubtitle') || 'In-depth reviews, build tips, and the latest Lego news. Join our community and connect on social media!';
+                reviews = JSON.parse(localStorage.getItem('reviews')) || defaultReviews.slice();
+            }
+            renderReviews();
+        }
 
         function renderReviews() {
             reviewsEditor.innerHTML = '';
@@ -112,7 +125,7 @@
             });
         }
 
-        renderReviews();
+        loadContent();
 
         document.getElementById('addReview').addEventListener('click', () => {
             reviews.push({title: '', text: '', img: ''});
@@ -135,12 +148,30 @@
             });
         }
 
-        document.getElementById('save').addEventListener('click', () => {
+        document.getElementById('save').addEventListener('click', async () => {
             collectData();
-            localStorage.setItem('heroTitle', heroTitleInput.value);
-            localStorage.setItem('heroSubtitle', heroSubtitleInput.value);
-            localStorage.setItem('reviews', JSON.stringify(reviews));
-            alert('Content saved!');
+            const payload = {
+                hero_title: heroTitleInput.value,
+                hero_subtitle: heroSubtitleInput.value,
+                reviews: reviews
+            };
+            try {
+                const res = await fetch('/content', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    localStorage.setItem('heroTitle', heroTitleInput.value);
+                    localStorage.setItem('heroSubtitle', heroSubtitleInput.value);
+                    localStorage.setItem('reviews', JSON.stringify(reviews));
+                    alert('Content saved!');
+                } else {
+                    alert('Error saving content');
+                }
+            } catch (err) {
+                alert('Error saving content');
+            }
         });
 
         document.getElementById('logout').addEventListener('click', () => {

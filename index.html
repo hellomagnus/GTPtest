@@ -171,14 +171,21 @@
             }
         ];
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const reviews = JSON.parse(localStorage.getItem('reviews')) || defaultReviews;
-            displayReviews(reviews);
-
-            const heroTitleEl = document.getElementById('heroTitle');
-            const heroSubtitleEl = document.getElementById('heroSubtitle');
-            heroTitleEl.textContent = localStorage.getItem('heroTitle') || heroTitleEl.textContent;
-            heroSubtitleEl.textContent = localStorage.getItem('heroSubtitle') || heroSubtitleEl.textContent;
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const res = await fetch('/content');
+                const data = await res.json();
+                displayReviews(data.reviews);
+                document.getElementById('heroTitle').textContent = data.hero_title;
+                document.getElementById('heroSubtitle').textContent = data.hero_subtitle;
+            } catch (err) {
+                const reviews = JSON.parse(localStorage.getItem('reviews')) || defaultReviews;
+                displayReviews(reviews);
+                const heroTitleEl = document.getElementById('heroTitle');
+                const heroSubtitleEl = document.getElementById('heroSubtitle');
+                heroTitleEl.textContent = localStorage.getItem('heroTitle') || heroTitleEl.textContent;
+                heroSubtitleEl.textContent = localStorage.getItem('heroSubtitle') || heroSubtitleEl.textContent;
+            }
 
             const adminLink = document.getElementById('adminLink');
             if (localStorage.getItem('loggedIn') === 'true') {
